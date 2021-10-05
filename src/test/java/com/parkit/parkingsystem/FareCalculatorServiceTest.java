@@ -142,4 +142,22 @@ public class FareCalculatorServiceTest {
     	// THEN
     	assertThat(ticket.getPrice()).isEqualTo(0);
     }
+    
+    @Test
+    public void calculateFareCarWithThirtyMinutesParkingTime() {
+    	// GIVEN
+    	Date inTime = new Date();
+    	inTime.setTime(System.currentTimeMillis() - (30 * 60 * 1000)); // equal to 30 minutes parking time
+    	Date outTime = new Date();
+    	ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+    	
+    	// WHEN
+    	ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        fareCalculatorService.calculateFare(ticket);
+    	
+    	// THEN
+    	assertThat(ticket.getPrice()).isEqualTo(0.5 * Fare.CAR_RATE_PER_HOUR); // the result is not equal to 0
+    }
 }
