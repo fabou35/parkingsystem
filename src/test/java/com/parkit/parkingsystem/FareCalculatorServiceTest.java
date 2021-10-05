@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
@@ -124,4 +125,21 @@ public class FareCalculatorServiceTest {
         assertEquals( (24 * Fare.CAR_RATE_PER_HOUR) , ticket.getPrice());
     }
 
+    @Test
+    public void calculateFareCarGiveZeroForLessThanThirtyMinutesParkingTime() {
+    	// GIVEN
+    	Date inTime = new Date();
+    	inTime.setTime(System.currentTimeMillis() - (29 * 60 * 1000)); // less than 30 minutes parking time
+    	Date outTime = new Date();
+    	ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+    	
+    	// WHEN
+    	ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        fareCalculatorService.calculateFare(ticket);
+    	
+    	// THEN
+    	assertThat(ticket.getPrice()).isEqualTo(0);
+    }
 }
