@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class FareCalculatorServiceTest {
@@ -159,5 +161,31 @@ public class FareCalculatorServiceTest {
     	
     	// THEN
     	assertThat(ticket.getPrice()).isEqualTo(0.5 * Fare.CAR_RATE_PER_HOUR); // the result is not equal to 0
+    }
+    
+    @Test
+    public void calculateFareCarForTwentyFiveHoursParkingTimeUsingDates() {
+    	// GIVEN
+    	Date intTime = new Date();
+    	Date outTime = new Date();
+    	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    	String dateInTime = "08/09/2021 10:00:00";
+    	String dateOutTime = "09/09/2021 11:00:00";
+    	try {
+			intTime = simpleDateFormat.parse(dateInTime);
+			outTime = simpleDateFormat.parse(dateOutTime);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+    	ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+    	
+    	// WHEN
+    	ticket.setInTime(intTime);
+    	ticket.setOutTime(outTime);
+    	ticket.setParkingSpot(parkingSpot);
+    	fareCalculatorService.calculateFare(ticket);
+    	
+    	// THEN
+    	assertThat(ticket.getPrice()).isEqualTo(25 * Fare.CAR_RATE_PER_HOUR);
     }
 }
