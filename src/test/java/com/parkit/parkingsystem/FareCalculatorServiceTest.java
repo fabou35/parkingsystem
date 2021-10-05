@@ -188,4 +188,33 @@ public class FareCalculatorServiceTest {
     	// THEN
     	assertThat(ticket.getPrice()).isEqualTo(25 * Fare.CAR_RATE_PER_HOUR);
     }
+    
+    @Test
+    public void calculateFareCarForTwentyThreeHoursParkingTimeWithDates() {
+    	// GIVEN
+		Date inTime = new Date();
+		Date outTime = new Date();
+		SimpleDateFormat sdf= new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		String dateInTime = "08/09/2021 10:00:00";
+		String dateOutTime = "09/09/2021 09:00:00";
+		
+		try {
+			inTime = sdf.parse(dateInTime);
+			outTime = sdf.parse(dateOutTime);
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+    	ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+    	
+    	// WHEN
+    	ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        fareCalculatorService.calculateFare(ticket);
+    	
+    	// THEN
+    	assertThat(ticket.getPrice()).isEqualTo(23 * Fare.CAR_RATE_PER_HOUR);
+    }
 }
