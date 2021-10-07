@@ -86,4 +86,24 @@ public class TicketDAO {
         }
         return false;
     }
+    
+    public boolean isARecurringUser(String vehicleRegNumber) {
+		Connection con = null;
+		try {
+			con = dataBaseConfig.getConnection();
+			PreparedStatement ps = con.prepareStatement("select * from ticket where VEHICLE_REG_NUMBER = ? and "
+					+ "OUT_TIME is not null");
+			ps.setString(1, vehicleRegNumber);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				return true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			dataBaseConfig.closeConnection(con);
+		}
+		return false;
+	}
 }
