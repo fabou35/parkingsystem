@@ -34,5 +34,10 @@ public class FareCalculatorService {
 				throw new IllegalArgumentException("Unkown Parking Type");
 			}
 		}
+		
+		// calculates the fare for recurring user
+		if(ticket.getRecurringUser()) {
+			ticket.setPrice(ticket.getPrice()*0.95);
+		}
 	}
 }
