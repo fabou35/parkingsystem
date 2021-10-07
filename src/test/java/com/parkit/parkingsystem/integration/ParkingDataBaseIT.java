@@ -163,4 +163,22 @@ public class ParkingDataBaseIT {
         
     }
 
+    @Test
+    public void isARecurringUser() {
+    	// GIVEN
+    	ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+    	
+        // WHEN
+    	parkingService.processIncomingVehicle();
+        // out_time = in_time + 5 seconds
+        try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+        parkingService.processExitingVehicle();
+        
+        // THEN
+        assertThat(ticketDAO.isARecurringUser("ABCDEF")).isEqualTo(true);
+    }
 }
