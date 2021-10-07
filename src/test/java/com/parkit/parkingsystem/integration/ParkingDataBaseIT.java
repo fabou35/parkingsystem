@@ -114,10 +114,53 @@ public class ParkingDataBaseIT {
 
     @Test
     public void testParkingLotExit(){
-        testParkingACar();
+    	// GIVEN
+    	Connection conTicket = null;
+    	String rsOutTimeAvailable = null;
+    	String rsPriceAvailable = "0";
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        parkingService.processIncomingVehicle();
+        // out_time = in_time + 5 seconds
+        try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
         parkingService.processExitingVehicle();
-        //TODO: check that the fare generated and out time are populated correctly in the database
+        
+        // WHEN
+        try {
+			// retrieves the out_time in the database
+			conTicket = ticketDAO.dataBaseConfig.getConnection();
+			PreparedStatement psTicket = conTicket.prepareStatement("select OUT_TIME from ticket "
+					+ "where VEHICLE_REG_NUMBER = ?");
+			psTicket.setString(1, inputReaderUtil.readVehicleRegistrationNumber());
+			ResultSet rsTicket = psTicket.executeQuery();
+			rsTicket.next();
+			rsOutTimeAvailable = rsTicket.getString(1);
+			ticketDAO.dataBaseConfig.closePreparedStatement(psTicket);
+			ticketDAO.dataBaseConfig.closeResultSet(rsTicket);
+			
+			// retrieves the fare in the database
+			PreparedStatement psPrice = conTicket.prepareStatement("select PRICE from ticket "
+					+ "where VEHICLE_REG_NUMBER = ?");
+			psPrice.setString(1, inputReaderUtil.readVehicleRegistrationNumber());
+			ResultSet rsPrice = psPrice.executeQuery();
+			rsPrice.next();
+			rsPriceAvailable = rsPrice.getString(1);
+			ticketDAO.dataBaseConfig.closePreparedStatement(psPrice);
+			ticketDAO.dataBaseConfig.closeResultSet(rsPrice);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        finally {
+			ticketDAO.dataBaseConfig.closeConnection(conTicket);
+		}
+        
+        // THEN
+        assertThat(rsOutTimeAvailable).isNotEqualTo(null);
+        assertThat(rsPriceAvailable).isEqualTo("0.0");
+        
     }
 
 }
